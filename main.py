@@ -128,16 +128,19 @@ class SudokuApp(QWidget):
                 cv2.destroyAllWindows()
                 return
             if key == 32:  # SPACE
-                img_path = "captured_sudoku.jpg"
-                cv2.imwrite(img_path, frame)
                 cap.release()
                 cv2.destroyAllWindows()
-                self.image_path = img_path
-                self.display_image(img_path)
+                self.captured_image = frame.copy()
+                self.image_path = None
+                self.display_image(self.captured_image)
                 break
-            
+
     def display_image(self, path):
-        img = cv2.imread(path)
+        if type(path) == str:
+            img = cv2.imread(path)
+        else:
+            img = path.copy()
+        self.captured_image = img
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         h, w, ch = img.shape
         bytes_per_line = ch * w
@@ -147,11 +150,14 @@ class SudokuApp(QWidget):
         self.label.setPixmap(pixmap)
 
     def solve_sudoku(self):
-        if not self.image_path:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn ảnh trước!")
+        if self.image_path is None and not hasattr(self, "captured_image"):
+            QMessageBox.warning(self, "Lỗi", "Vui lòng chọn hoặc chụp ảnh trước!")
             return
         try:
-            img = cv2.imread(self.image_path, 0)
+            if self.image_path:
+                img = cv2.imread(self.image_path, 0)
+            else:
+                img = cv2.cvtColor(self.captured_image, cv2.COLOR_BGR2GRAY)
             warp = detect_board(img)
             if warp is None:
                 QMessageBox.warning(self, "Lỗi", "Không phát hiện được bảng Sudoku. Vui lòng chụp lại ảnh!")
