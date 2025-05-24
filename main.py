@@ -121,7 +121,7 @@ class SudokuApp(QWidget):
             ret, frame = cap.read()
             if not ret:
                 break
-            cv2.imshow("Chụp ảnh Sudoku - Nhấn SPACE để chụp", frame)
+            cv2.imshow("Chup anh Sudoku", frame)
             key = cv2.waitKey(1)
             if key == 27:  # ESC
                 cap.release()

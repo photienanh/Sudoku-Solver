@@ -4,9 +4,7 @@ import torch.optim as optim
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
-import numpy as np
 import time
-import cv2
 
 class DigitCNN(nn.Module):
     def __init__(self):
@@ -38,7 +36,6 @@ class DigitCNN(nn.Module):
         x = self.fc(x)
         return x
     
-
 def train(model, train_loader, val_loader, criterion, optimizer, device, num_epochs):
     for epoch in range(num_epochs):
         start_epoch = time.time()
@@ -85,27 +82,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, num_epo
             avg_train_loss, avg_train_acc * 100,
             avg_val_loss, avg_val_acc * 100, end_epoch - start_epoch))
     return model
-
-def predict_digit(cell_img, model, device):
-    img = cv2.resize(cell_img, (28, 28))
-
-    if len(img.shape) == 2 or img.shape[2] == 1:
-        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = img.astype(np.float32) / 255.0
-    mean = np.array([0.5, 0.5, 0.5])
-    std = np.array([0.5, 0.5, 0.5])
-    img = (img - mean) / std
-    img = np.transpose(img, (2, 0, 1))
-    tensor = torch.tensor(img, dtype=torch.float32).unsqueeze(0).to(device)
-
-    model.eval()
-    with torch.no_grad():
-        output = model(tensor)
-        pred = output.argmax(dim=1).item() + 1
-
-    return pred
 
 if __name__ == "__main__":
     transform_train = transforms.Compose([

@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import torch
 import copy
-from digit_recognition import DigitCNN, predict_digit
+from digit_recognition_train import DigitCNN
 
 def resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
@@ -21,6 +21,28 @@ def is_empty_cell(cell_img, threshold=0.05, contrast_thresh=15):
         std_dev = np.std(center)
         return std_dev < contrast_thresh
     return False
+
+
+def predict_digit(cell_img, model, device):
+    img = cv2.resize(cell_img, (28, 28))
+
+    if len(img.shape) == 2 or img.shape[2] == 1:
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = img.astype(np.float32) / 255.0
+    mean = np.array([0.5, 0.5, 0.5])
+    std = np.array([0.5, 0.5, 0.5])
+    img = (img - mean) / std
+    img = np.transpose(img, (2, 0, 1))
+    tensor = torch.tensor(img, dtype=torch.float32).unsqueeze(0).to(device)
+
+    model.eval()
+    with torch.no_grad():
+        output = model(tensor)
+        pred = output.argmax(dim=1).item() + 1
+
+    return pred
 
 def is_valid(board, row, col, num):
     for i in range(9):
