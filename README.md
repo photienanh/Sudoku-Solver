@@ -11,7 +11,7 @@ Below are some example screenshots of the application in use:
 
 | Upload Image | Solved Result | Capture from Webcam | Solved Webcam Result |
 |:------------:|:-------------:|:-------------------:|:--------------------:|
-| ![Image](https://i.ibb.co/CKQ7bDW1/solve-img.png) | ![Image](https://i.ibb.co/HTrNmWN4/solve-img-result.png) | ![Image](https://i.ibb.co/tdjnjh7/solve-cam.png) | ![Image](https://i.ibb.co/KprJfvZn/solve-cam-result.png) |
+| ![Image](https://cdn.anh.moe/f/G6IXpYWn.png-webp) | ![Image](https://cdn.anh.moe/f/Lr5yjM.png-webp) | ![Image](https://cdn.anh.moe/f/xsbnJfZH.png-webp) | ![Image](https://cdn.anh.moe/f/ad1XRo2q.png-webp) |
 
 ## Directory Structure
 ```
