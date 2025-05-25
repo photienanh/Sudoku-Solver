@@ -24,8 +24,11 @@ def is_empty_cell(cell_img, threshold=0.05, contrast_thresh=15):
 
 
 def predict_digit(cell_img, model, device):
-    img = cv2.resize(cell_img, (28, 28))
-
+    h, w = cell_img.shape[:2]
+    start_x = (w - 40) // 2
+    start_y = (h - 40) // 2
+    img = cell_img[start_y:start_y+40, start_x:start_x+40]
+    img = cv2.resize(img, (28, 28))
     if len(img.shape) == 2 or img.shape[2] == 1:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 

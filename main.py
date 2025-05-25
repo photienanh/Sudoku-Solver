@@ -104,6 +104,7 @@ class SudokuApp(QWidget):
         self.image_path = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = load_model(self.device)
+        self.first_capture = True
 
     def load_image(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Image Files (*.png *.jpg *.bmp)")
@@ -116,7 +117,9 @@ class SudokuApp(QWidget):
         if not cap.isOpened():
             QMessageBox.critical(self, "Lỗi", "Không mở được webcam!")
             return
-        QMessageBox.information(self, "Hướng dẫn", "Nhấn SPACE để chụp, ESC để hủy.")
+        if self.first_capture:
+            QMessageBox.information(self, "Hướng dẫn", "Nhấn SPACE để chụp, ESC để hủy.")
+            self.first_capture = False
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -160,13 +163,31 @@ class SudokuApp(QWidget):
                 img = cv2.cvtColor(self.captured_image, cv2.COLOR_BGR2GRAY)
             warp = detect_board(img)
             if warp is None:
-                QMessageBox.warning(self, "Lỗi", "Không phát hiện được bảng Sudoku. Vui lòng chụp lại ảnh!")
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setText("Không phát hiện được bảng Sudoku. Vui lòng chụp lại ảnh!")
+                msg.setWindowTitle("Lỗi")
+                msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                msg.button(QMessageBox.Ok).setText("Chụp lại")
+                msg.button(QMessageBox.Cancel).setText("Hủy")
+                result_btn = msg.exec_()
+                if result_btn == QMessageBox.Ok:
+                    self.capture_image()
                 return
             cells = split_cells(warp)
             board = get_board(cells, self.model, self.device)
             solved_board = solve_sudoku(board)
             if solved_board is None:
-                QMessageBox.warning(self, "Lỗi", "Không tìm được lời giải cho Sudoku này!")
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setText("Ảnh chụp bị mờ. Vui lòng chụp lại ảnh!")
+                msg.setWindowTitle("Lỗi")
+                msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                msg.button(QMessageBox.Ok).setText("Chụp lại")
+                msg.button(QMessageBox.Cancel).setText("Hủy")
+                result_btn = msg.exec_()
+                if result_btn == QMessageBox.Ok:
+                    self.capture_image()
                 return
             result_img = draw_solution_on_image(warp.copy(), board, solved_board)
             result_img = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
