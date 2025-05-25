@@ -6,6 +6,14 @@ A Python project for solving Sudoku puzzles automatically. It uses computer visi
 - Use a trained deep learning model to recognize digits.
 - Solve the puzzle and display the solution.
 - Simple and user-friendly GUI.
+## Preview
+
+Below are some example screenshots of the application in use:
+
+| Upload Image | Solved Result | Capture from Webcam | Solved Webcam Result |
+|:------------:|:-------------:|:-------------------:|:--------------------:|
+| ![solve_img](solve_img.png) | ![solve_img_result](solve_img_result.png) | ![solve_cam](solve_cam.png) | ![solve_cam_result](solve_cam_result.png) |
+
 ## Directory Structure
 ```
 SudokuSolver/
