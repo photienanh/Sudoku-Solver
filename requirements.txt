@@ -2,3 +2,6 @@ opencv-python
 torch
 torchvision
 pyqt5
+gradio
+Pillow
+numpy

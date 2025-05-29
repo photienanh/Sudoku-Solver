@@ -28,12 +28,13 @@ SudokuSolver/
 ├── digit_dataset_generation.py  # Script to generate digit dataset
 ├── digit_recognition_train.py   # Trains a CNN model (PyTorch) for digit recognition
 ├── solve_sudoku.py              # Recognizes digits, solves Sudoku, and draws solution
-├── main.py                      # GUI application (PyQt5)
+├── local_app.py                 # Local GUI application (PyQt5)
+├── app.py                       # GUI for Hugging Face spaces
 ├── requirements.txt             # Required libraries
 └── Model/
     └── digit_cnn.pth            # Trained digit recognition model
 ```
-## Requirements
+## Requirements (For Local Setup)
 - Python 3.6 or higher.
 - Libraries in requirements.txt.
 ## Installation (For Local Setup)
@@ -55,9 +56,9 @@ pip install -r requirements.txt
     > **Note:** These steps can be skipped because a pre-trained model (`Model/digit_cnn.pth`) is already included.
 
 2. To start the application:
-    - Run `main.py` to open the graphical user interface and begin using the Sudoku Solver.
+    - Run `local_app.py` to open the graphical user interface and begin using the Sudoku Solver.
     ```bash
-    python main.py
+    python local_app.py
     ```
 ### Webcam Instructions
 - Press **SPACE** to capture an image of the Sudoku puzzle from your webcam.
