@@ -12,7 +12,14 @@ Below are some example screenshots of the application in use:
 | Upload Image | Solved Result | Capture from Webcam | Solved Webcam Result |
 |:------------:|:-------------:|:-------------------:|:--------------------:|
 | ![Image](https://cdn.anh.moe/f/G6IXpYWn.png-webp) | ![Image](https://cdn.anh.moe/f/Lr5yjM.png-webp) | ![Image](https://cdn.anh.moe/f/xsbnJfZH.png-webp) | ![Image](https://cdn.anh.moe/f/ad1XRo2q.png-webp) |
+## How to Run
 
+### Option 1: Online Version (Recommended)
+🚀 **Try it instantly without any installation!**
+
+Visit: [https://huggingface.co/spaces/photienanh/Sudoku-Solver](https://huggingface.co/spaces/photienanh/Sudoku-Solver)
+
+### Option 2: Local Installation
 ## Directory Structure
 ```
 SudokuSolver/
@@ -29,7 +36,7 @@ SudokuSolver/
 ## Requirements
 - Python 3.6 or higher.
 - Libraries in requirements.txt.
-## Installation
+## Installation (For Local Setup)
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/photienanh/Sudoku-Solver
