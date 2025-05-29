@@ -2,7 +2,7 @@ import gradio as gr
 import cv2
 import torch
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import os
 from detect_board import detect_board, split_cells
 from solve_sudoku import get_board, solve_sudoku, draw_solution_on_image, load_model
@@ -70,114 +70,108 @@ def process_image(image):
 def main():
     """Hàm chính khởi tạo giao diện Gradio"""
     
-    # CSS tùy chỉnh cho giao diện
+    # CSS responsive cho cả PC và Mobile
     custom_css = """
+    /* Container chính */
     .gradio-container {
         font-family: 'Arial', sans-serif !important;
         background-color: #f5f6fa !important;
-        max-width: 700px !important;
+        max-width: 800px !important;
         margin: 0 auto !important;
+        padding: 20px !important;
     }
     
+    /* Tiêu đề */
     .title-header {
         font-size: 36px !important;
         font-weight: bold !important;
         color: #273c75 !important;
         text-align: center !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 15px !important;
         padding: 20px !important;
     }
     
-    .main-image {
-        width: 600px !important;
+    /* Hiển thị ảnh */
+    .main-image, .camera-container {
+        width: 100% !important;
+        max-width: 600px !important;
         height: 600px !important;
         background-color: white !important;
         border: 2px solid #dcdde1 !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         margin: 0 auto !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Buttons styling */
+    .btn-load, .btn-capture, .btn-solve {
+        color: white !important;
+        border-radius: 10px !important;
+        padding: 14px 20px !important;
+        width: 200px !important;
+        font-family: 'Arial', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        border: none !important;
+        margin: 8px !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
     }
     
     .btn-load {
-        background-color: #00a8ff !important;
-        color: white !important;
-        border-radius: 8px !important;
-        padding: 16px 32px !important;
-        width: 220px !important;
-        font-family: 'Arial' !important;
-        font-size: 15px !important;
-        border: none !important;
-        margin: 0 10px !important;
-        font-weight: bold !important;
-        cursor: pointer;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     }
-
+    
     .btn-load:hover {
-        background-color: #0097e6 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4) !important;
     }
 
     .btn-capture {
-        background-color: #e17055 !important;
-        color: white !important;
-        border-radius: 8px !important;
-        padding: 16px 32px !important;
-        width: 220px !important;
-        font-family: 'Arial' !important;
-        font-size: 15px !important;
-        border: none !important;
-        margin: 0 10px !important;
-        font-weight: bold !important;
-        cursor: pointer;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
     }
 
     .btn-capture:hover {
-        background-color: #d35400 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4) !important;
     }
 
     .btn-solve {
-        background-color: #44bd32 !important;
-        color: white !important;
-        border-radius: 8px !important;
-        padding: 16px 32px !important;
-        width: 220px !important;
-        font-family: 'Arial' !important;
-        font-size: 15px !important;
-        border: none !important;
-        margin: 0 10px !important;
-        font-weight: bold !important;
-        cursor: pointer;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
     }
 
     .btn-solve:hover {
-        background-color: #4cd137 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4) !important;
     }
 
+    /* Button row */
     .button-row {
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-        gap: 20px !important;
-        margin: 20px 0 !important;
+        gap: 15px !important;
+        margin: 25px 0 !important;
+        flex-wrap: wrap !important;
     }
     
+    /* Status text */
     .status-text {
         text-align: center !important;
-        padding: 10px !important;
-        margin: 10px 0 !important;
+        padding: 12px !important;
+        margin: 15px 0 !important;
         background-color: white !important;
-        border-radius: 5px !important;
+        border-radius: 8px !important;
         border: 1px solid #dcdde1 !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
     }
     
-    .camera-container {
-        width: 600px !important;
-        height: 600px !important;
-        background-color: white !important;
-        border: 2px solid #dcdde1 !important;
-        border-radius: 10px !important;
-        margin: 0 auto !important;
-    }
-    
-    /* Tắt tất cả transform để không lật ảnh camera */
+    /* Camera settings */
     .camera-container .wrap {
         transform: none !important;
     }
@@ -188,6 +182,79 @@ def main():
     
     .camera-container canvas {
         transform: none !important;
+    }
+    
+    /* ===== RESPONSIVE MOBILE ===== */
+    @media (max-width: 768px) {
+        /* Container */
+        .gradio-container {
+            max-width: 100% !important;
+            padding: 10px !important;
+            margin: 0 !important;
+        }
+        
+        /* Tiêu đề mobile */
+        .title-header {
+            font-size: 24px !important;
+            padding: 15px 10px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        /* Ảnh responsive */
+        .main-image, .camera-container {
+            width: 95% !important;
+            height: 350px !important;
+            margin: 10px auto !important;
+        }
+        
+        /* Buttons mobile */
+        .btn-load, .btn-capture, .btn-solve {
+            width: 140px !important;
+            padding: 12px 16px !important;
+            font-size: 13px !important;
+            margin: 5px !important;
+        }
+        
+        /* Button row mobile */
+        .button-row {
+            gap: 8px !important;
+            margin: 15px 0 !important;
+            justify-content: space-around !important;
+        }
+        
+        /* Status mobile */
+        .status-text {
+            font-size: 12px !important;
+            padding: 10px !important;
+            margin: 10px 5px !important;
+        }
+    }
+    
+    /* ===== RESPONSIVE TABLET ===== */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .title-header {
+            font-size: 30px !important;
+        }
+        
+        .main-image, .camera-container {
+            height: 500px !important;
+        }
+        
+        .btn-load, .btn-capture, .btn-solve {
+            width: 180px !important;
+            font-size: 14px !important;
+        }
+    }
+    
+    /* ===== RESPONSIVE LARGE SCREEN ===== */
+    @media (min-width: 1200px) {
+        .gradio-container {
+            max-width: 900px !important;
+        }
+        
+        .main-image, .camera-container {
+            height: 650px !important;
+        }
     }
     """
     
@@ -230,7 +297,7 @@ def main():
                 sources=["webcam"],
                 interactive=True,
                 visible=False,
-                mirror_webcam=False  # Tắt mirror để ảnh không bị lật
+                mirror_webcam=False
             )
         
         # Hàng 3 nút chức năng
@@ -239,19 +306,19 @@ def main():
                 "📁 Chọn ảnh",
                 file_types=["image"],
                 elem_classes="btn-load",
-                size="sm"
+                size="lg"
             )
             
             btn_capture = gr.Button(
                 "📸 Chụp ảnh",
                 elem_classes="btn-capture",
-                size="sm"
+                size="lg"
             )
             
             btn_solve = gr.Button(
                 "🚀 Giải Sudoku",
                 elem_classes="btn-solve",
-                size="sm"
+                size="lg"
             )
         
         # Thông báo trạng thái (ẩn mặc định)
@@ -277,9 +344,9 @@ def main():
                     False,  # Tắt camera mode
                     "",  # Xóa status
                     gr.update(visible=False),  # Ẩn status
-                    "Chụp ảnh"  # Reset text nút
+                    "📸 Chụp ảnh"  # Reset text nút
                 )
-            return None, gr.update(), None, False, "", gr.update(visible=False), "Chụp ảnh"
+            return None, gr.update(), None, False, "", gr.update(visible=False), "📸 Chụp ảnh"
         
         # Xử lý bật/tắt camera
         def toggle_camera(is_camera_mode):
@@ -290,7 +357,7 @@ def main():
                     gr.update(visible=True),   # Hiện ảnh
                     gr.update(visible=False),  # Ẩn camera
                     False,  # Tắt camera mode
-                    "Chụp ảnh"  # Đổi text nút
+                    "📸 Chụp ảnh"  # Đổi text nút
                 )
             else:
                 # Bật camera, ẩn hiển thị ảnh
@@ -298,7 +365,7 @@ def main():
                     gr.update(visible=False),  # Ẩn ảnh
                     gr.update(visible=True),   # Hiện camera
                     True,   # Bật camera mode
-                    "Đóng camera"  # Đổi text nút
+                    "❌ Đóng camera"  # Đổi text nút
                 )
         
         # Xử lý chụp ảnh từ camera
@@ -310,11 +377,11 @@ def main():
                     gr.update(visible=False),  # Ẩn camera
                     webcam_img,  # Lưu ảnh vào state
                     False,  # Tắt camera mode
-                    "📸 Đã chụp ảnh từ camera!",  # Thông báo
+                    "📸 Đã chụp ảnh từ camera thành công!",  # Thông báo
                     gr.update(visible=True),  # Hiện thông báo
-                    "Chụp ảnh"  # Reset text nút
+                    "📸 Chụp ảnh"  # Reset text nút
                 )
-            return None, gr.update(), None, is_camera_mode, "", gr.update(visible=False), "Chụp ảnh"
+            return None, gr.update(), None, is_camera_mode, "", gr.update(visible=False), "📸 Chụp ảnh"
         
         # Xử lý giải Sudoku
         def solve_handler(current_img):
@@ -329,7 +396,7 @@ def main():
             if "❌" in status:
                 return result_img, status, gr.update(visible=True)
             
-            return result_img, "", gr.update(visible=False)
+            return result_img, status, gr.update(visible=True)
         
         # Kết nối các sự kiện với hàm xử lý
         btn_load.upload(
